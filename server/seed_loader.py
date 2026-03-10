@@ -28,6 +28,7 @@ INSERT_ORDER: list[str] = [
 ]
 
 UPSERT_CONFLICT_COLUMNS: dict[str, list[str]] = {
+    "users": ["id"],
     "incident_services": ["incident_id", "service_id"],
 }
 
@@ -58,9 +59,7 @@ def load_records(table_name: str) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     for index, item in enumerate(payload):
         if not isinstance(item, dict):
-            raise ValueError(
-                f"Expected object at {path} index {index}, got {type(item).__name__}"
-            )
+            raise ValueError(f"Expected object at {path} index {index}, got {type(item).__name__}")
         records.append(item)
 
     return records
@@ -76,7 +75,7 @@ def insert_record(
     cursor: psycopg2.extensions.cursor,
     table_name: str,
     record: dict[str, Any],
-) -> None:
+) -> int:
     if not record:
         raise ValueError(f"Cannot insert empty record into table '{table_name}'")
 
@@ -120,6 +119,7 @@ def insert_record(
         )
 
     cursor.execute(query, values)
+    return cursor.rowcount
 
 
 def seed_table(
@@ -128,22 +128,21 @@ def seed_table(
 ) -> None:
     records = load_records(table_name)
 
+    if not records:
+        print(f"[SKIP] {table_name}: no records")
+        connection.commit()
+        return
+
     with connection.cursor() as cursor:
         if table_name in REPLACE_TABLES_ON_SEED:
-            cursor.execute(
-                sql.SQL("DELETE FROM {table}").format(table=sql.Identifier(table_name))
-            )
-
-        if not records:
-            print(f"[SKIP] {table_name}: no records")
-            connection.commit()
-            return
+            cursor.execute(sql.SQL("DELETE FROM {table}").format(table=sql.Identifier(table_name)))
+        affected_rows = 0
 
         for record in records:
-            insert_record(cursor, table_name, record)
+            affected_rows += insert_record(cursor, table_name, record)
 
     connection.commit()
-    print(f"[OK] {table_name}: inserted {len(records)} record(s)")
+    print(f"[OK] {table_name}: processed {len(records)} record(s), affected {affected_rows} row(s)")
 
 
 def main() -> None:

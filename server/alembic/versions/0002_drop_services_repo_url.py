@@ -25,4 +25,3 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.add_column("services", sa.Column("repo_url", sa.String(length=300), nullable=True))
-

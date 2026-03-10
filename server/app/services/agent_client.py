@@ -27,7 +27,11 @@ async def query_ops_agent(*, query: str, user_id: str) -> str:
             f"Agent service returned {response.status_code}: {response.text[:200]}"
         )
 
-    data = response.json()
+    try:
+        data = response.json()
+    except ValueError as exc:
+        raise AgentClientError("Agent service returned a non-JSON response body.") from exc
+
     answer = data.get("answer")
     if not isinstance(answer, str) or not answer.strip():
         raise AgentClientError("Agent service response missing non-empty 'answer'.")

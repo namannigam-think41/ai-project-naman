@@ -195,4 +195,3 @@ class InvestigationEvidence(Base):
     excerpt: Mapped[str | None] = mapped_column(Text, nullable=True)
     confidence_score: Mapped[Decimal | None] = mapped_column(Numeric(4, 3), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
-
