@@ -172,9 +172,7 @@ def upgrade() -> None:
         sa.Column("is_primary", sa.Boolean(), nullable=False, server_default=sa.false()),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
         sa.ForeignKeyConstraint(["service_id"], ["services.id"]),
-        sa.UniqueConstraint(
-            "service_id", "priority_order", name="uq_service_escalation_priority"
-        ),
+        sa.UniqueConstraint("service_id", "priority_order", name="uq_service_escalation_priority"),
     )
     op.create_index("ix_escalation_contacts_service_id", "escalation_contacts", ["service_id"])
 
@@ -206,9 +204,7 @@ def upgrade() -> None:
     )
     op.create_index("ix_messages_session_id", "messages", ["session_id"])
     op.create_index("ix_messages_created_at", "messages", ["created_at"])
-    op.create_index(
-        "ix_messages_session_id_created_at", "messages", ["session_id", "created_at"]
-    )
+    op.create_index("ix_messages_session_id_created_at", "messages", ["session_id", "created_at"])
 
     op.create_table(
         "investigation_evidence",
