@@ -4,7 +4,6 @@ import type { LoginResponse } from "@/types/auth";
 export const AUTH_KEY = "opscopilot.auth";
 
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
-let refreshInFlight: Promise<LoginResponse> | null = null;
 
 export const readStoredAuth = (): LoginResponse | null => {
   try {
@@ -73,33 +72,9 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    const stored = readStoredAuth();
-    if (!stored?.refresh_token) {
-      clearStoredAuth();
-      return Promise.reject(error);
-    }
-
-    try {
-      original._retry = true;
-      if (!refreshInFlight) {
-        refreshInFlight = axios
-          .post<LoginResponse>("/auth/refresh", { refresh_token: stored.refresh_token }, { baseURL: "/" })
-          .then((resp) => {
-            writeStoredAuth(resp.data);
-            return resp.data;
-          })
-          .finally(() => {
-            refreshInFlight = null;
-          });
-      }
-      const refreshed = await refreshInFlight;
-      original.headers = original.headers ?? {};
-      original.headers.Authorization = `Bearer ${refreshed.access_token}`;
-      return api(original);
-    } catch {
-      clearStoredAuth();
-      return Promise.reject(error);
-    }
+    original._retry = true;
+    clearStoredAuth();
+    return Promise.reject(error);
   },
 );
 

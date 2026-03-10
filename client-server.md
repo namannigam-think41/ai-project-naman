@@ -46,8 +46,8 @@ Goals:
 ### Frontend Token Rules
 - Store auth payload in localStorage key: `opscopilot.auth`.
 - Send `Authorization: Bearer <access_token>` for protected APIs.
-- On `401` (non-auth endpoint), attempt one refresh and retry once.
-- If refresh fails, clear storage and force signed-out state.
+- On `401` (non-auth endpoint), clear storage and force signed-out state.
+- Frontend does not auto-refresh tokens in MVP.
 
 ## 3. Chat CRUD Contract
 All endpoints below are protected under `/api/v1`.

@@ -95,19 +95,13 @@ async def refresh_tokens(
     if user is None or not user.is_active or user.role != "operations_engineer":
         return None, None, None
 
+    # Keep refresh flow simple for MVP: renew the same DB row with a new opaque token.
     new_refresh_plain = _new_refresh_token()
-    new_row = RefreshToken(
-        id=uuid4(),
-        user_id=user.id,
-        token_hash=_refresh_token_hash(new_refresh_plain),
-        issued_at=now,
-        expires_at=now + timedelta(days=REFRESH_TOKEN_TTL_DAYS),
-    )
-    db.add(new_row)
-    # Flush insert first so replaced_by_token_id always points to an existing row.
-    await db.flush()
-    token_row.revoked_at = now
-    token_row.replaced_by_token_id = new_row.id
+    token_row.token_hash = _refresh_token_hash(new_refresh_plain)
+    token_row.issued_at = now
+    token_row.expires_at = now + timedelta(days=REFRESH_TOKEN_TTL_DAYS)
+    token_row.revoked_at = None
+    token_row.replaced_by_token_id = None
     await db.commit()
     return _create_access_token(user), new_refresh_plain, user
 
