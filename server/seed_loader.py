@@ -64,6 +64,13 @@ def get_connection() -> psycopg2.extensions.connection:
             f"Missing DB environment configuration. Set DATABASE_URL or all of: {missing_str}"
         )
 
+    # Narrow Optional env values for static type checking after the runtime guard above.
+    assert db_host is not None
+    assert db_port is not None
+    assert db_name is not None
+    assert db_user is not None
+    assert db_password is not None
+
     return psycopg2.connect(
         host=db_host,
         port=int(db_port),
