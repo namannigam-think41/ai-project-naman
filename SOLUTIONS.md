@@ -35,7 +35,22 @@ High-level request path:
 4. Ops-Agent returns structured JSON.
 5. Backend maps/persists response and returns it to frontend.
 
+ADK Web test path (graph entry in `ops-agent`):
+
+```text
+ADK Web (adk_app)
+  -> root_agent export (adk_app/agent.py)
+  -> OpsCopilot multi-agent graph
+  -> Structured response
+```
+
 ## 3. Agent Architecture
+
+### Root Graph Agent (`OpsCopilotInvestigationFlow`)
+
+- ADK graph root for investigation execution.
+- Runs stage agents in sequence for traceability.
+- Used for ADK Web visualization and runtime entry.
 
 ### OpsCopilotOrchestratorAgent
 
@@ -66,7 +81,6 @@ High-level request path:
 ```text
 User Query
   -> Orchestrator
-  -> Parallel Retrieval (DB + Docs)
   -> Context Builder
   -> Incident Analysis (loop if needed)
   -> Response Composer
@@ -76,8 +90,8 @@ User Query
 Key execution behavior:
 
 - **Sequential stages** for reasoning quality and traceability.
-- **Parallel retrieval** to reduce latency for data gathering.
 - **Analysis loop** for missing-information recovery before final response.
+- Retrieval tools are still available at agent/tool layer for evidence grounding.
 
 ## 5. Tools Layer
 
@@ -169,6 +183,7 @@ server/
 ops-agent/
   app/main.py                    # /v1/investigate API
   app/service.py                 # service entry
+  app/investigation_entry.py     # shared API entrypoint
   app/investigation_flow.py      # core multi-agent runtime
   app/agents/
     orchestrator_agent.py
@@ -176,6 +191,8 @@ ops-agent/
     incident_analysis_agent.py
     response_composer_agent.py
     runtime.py
+  adk_app/
+    agent.py                     # ADK Web root agent export
   app/tools/
     agent_tools.py
     docs_search.py

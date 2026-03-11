@@ -24,23 +24,16 @@ interface MessageApi {
   created_at: string;
 }
 
-const filterSessions = (sessions: ChatSession[], query: string): SessionGroup[] => {
-  const normalized = query.trim().toLowerCase();
-  const filtered = normalized
-    ? sessions.filter((session) => session.title.toLowerCase().includes(normalized))
-    : sessions;
-
-  return [{ label: "Recent Investigations", sessions: filtered }];
-};
+const toSessionGroups = (sessions: ChatSession[]): SessionGroup[] => [
+  { label: "Recent Investigations", sessions },
+];
 
 export interface ChatState {
   groupedSessions: SessionGroup[];
   selectedSession: ChatSession | null;
   sessionMessages: ChatMessage[];
-  searchQuery: string;
   draft: string;
   isSending: boolean;
-  setSearchQuery: (value: string) => void;
   setDraft: (value: string) => void;
   selectSession: (sessionId: string) => void;
   createNewChat: () => void;
@@ -80,15 +73,11 @@ export const useChatState = (): ChatState => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [messagesBySession, setMessagesBySession] = useState<Record<string, ChatMessage[]>>({});
   const [selectedSessionId, setSelectedSessionId] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [draft, setDraft] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const sendInFlightRef = useRef<boolean>(false);
 
-  const groupedSessions = useMemo(
-    () => filterSessions(sessions, searchQuery),
-    [sessions, searchQuery],
-  );
+  const groupedSessions = useMemo(() => toSessionGroups(sessions), [sessions]);
 
   const selectedSession = useMemo(
     () => sessions.find((session) => session.id === selectedSessionId) ?? null,
@@ -218,10 +207,8 @@ export const useChatState = (): ChatState => {
     groupedSessions,
     selectedSession,
     sessionMessages,
-    searchQuery,
     draft,
     isSending,
-    setSearchQuery,
     setDraft,
     selectSession,
     createNewChat,

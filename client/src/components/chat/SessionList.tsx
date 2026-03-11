@@ -20,7 +20,7 @@ export function SessionList({ groups, activeSessionId, onSelect, onDelete }: Ses
           >
             {group.label}
           </Typography>
-          <Stack spacing={0.65}>
+          <Stack spacing={0.75}>
             {group.sessions.length === 0 ? (
               <Typography variant="body2" sx={{ color: "#6781b0", px: 0.5 }}>
                 No investigations found.

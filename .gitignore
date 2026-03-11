@@ -12,3 +12,10 @@ dist/
 *.egg-info/
 htmlcov/
 .coverage
+
+# ADK generated runtime/eval artifacts (do not commit)
+**/.adk/
+**/.adk/**
+**/eval_history/
+**/eval_history/**
+**/*.evalset_result.json

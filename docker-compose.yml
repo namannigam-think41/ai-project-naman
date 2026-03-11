@@ -16,6 +16,7 @@ services:
       - ./ops-agent/.env
     environment:
       MODEL_NAME: gemini-2.5-flash
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/app_scaffold
       OPS_AGENT_SEED_DIR: /seed_data
     volumes:
       - ./server/seed_data:/seed_data:ro

@@ -5,7 +5,7 @@ import asyncio
 import json
 from uuid import uuid4
 
-from app.investigation_flow import run_investigation_pipeline
+from app.investigation_entry import run_investigation_entrypoint
 
 
 async def _main() -> None:
@@ -23,7 +23,7 @@ async def _main() -> None:
     session_id = args.session_id or str(uuid4())
     request_id = args.request_id or f"req-{uuid4()}"
 
-    result = await run_investigation_pipeline(
+    result = await run_investigation_entrypoint(
         request_id=request_id,
         session_id=session_id,
         user_id=args.user_id,

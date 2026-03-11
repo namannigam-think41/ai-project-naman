@@ -11,8 +11,8 @@ from app.contracts.incident_analysis import (
     IterationSummary,
     LoopRuntimePolicy,
 )
+from app.contracts.orchestrator import InvestigationScope
 from app.tools.agent_tools import (
-    get_incident_evidence,
     get_service_dependencies,
     get_service_owner,
     get_similar_incidents,
@@ -23,14 +23,22 @@ AGENT_NAME = "IncidentAnalysisAgent"
 INCIDENT_ANALYSIS_PROMPT = """
 You are IncidentAnalysisAgent.
 Return IncidentAnalysisOutput JSON only.
-Use only provided evidence. If uncertain, say "we don't have knowledge about this".
+Use only provided evidence from incident/events/docs/services.
+Do not present assumptions as facts.
+For each hypothesis:
+- `supporting_evidence_refs` must reference real ids from provided data.
+- `reasoning_summary` must clearly distinguish evidence-backed statements vs inference.
+If certainty is low or evidence is missing, keep confidence low and include missing_information.
+If uncertain, say "we don't have knowledge about this".
+Do not emit markdown/code fences.
+Never output placeholder text like "already processed" or "no more outputs needed".
+For each user turn, produce a complete analysis output.
 """.strip()
 
 incident_analysis_agent = build_stage_agent(
     name=AGENT_NAME,
     instruction=INCIDENT_ANALYSIS_PROMPT,
     tools=[
-        get_incident_evidence,
         get_service_dependencies,
         get_service_owner,
         get_similar_incidents,
@@ -48,34 +56,109 @@ async def analysis_with_adk_or_fallback(
     *,
     policy: LoopRuntimePolicy | None = None,
 ) -> IncidentAnalysisOutput:
+    if payload.investigation_scope == InvestigationScope.OWNERSHIP:
+        owner_rows = [
+            row
+            for row in payload.services
+            if any(row.get(k) for k in ("owner_name", "owner_username", "owner_email"))
+        ]
+        if owner_rows:
+            primary = owner_rows[0]
+            owner_label = (
+                str(primary.get("owner_name") or "").strip()
+                or str(primary.get("owner_username") or "").strip()
+                or str(primary.get("owner_email") or "").strip()
+                or "unknown owner"
+            )
+            service_label = str(primary.get("service_name") or "service").strip()
+            hypothesis = AnalysisHypothesis(
+                cause=f"Ownership for {service_label} is assigned to {owner_label}.",
+                confidence=0.8,
+                supporting_evidence_refs=[f"service:{service_label}"],
+                counter_evidence_refs=[],
+                reasoning_summary="Ownership answer is derived from retrieved service-owner metadata.",
+            )
+            return IncidentAnalysisOutput(
+                hypotheses=[hypothesis],
+                analysis_decision=AnalysisDecision.STOP,
+                missing_information=[],
+                confidence=hypothesis.confidence,
+                status="complete",
+                iteration_summaries=[
+                    IterationSummary(
+                        iteration=1,
+                        requested_additional_tools=[],
+                        received_evidence_count=0,
+                        confidence_delta=0.0,
+                        decision=AnalysisDecision.STOP,
+                    )
+                ],
+            )
+
+        return IncidentAnalysisOutput(
+            hypotheses=[],
+            analysis_decision=AnalysisDecision.INCONCLUSIVE,
+            missing_information=[
+                "we don't have knowledge about this: missing ownership metadata"
+            ],
+            confidence=0.0,
+            status="inconclusive",
+            iteration_summaries=[
+                IterationSummary(
+                    iteration=1,
+                    requested_additional_tools=[],
+                    received_evidence_count=0,
+                    confidence_delta=0.0,
+                    decision=AnalysisDecision.INCONCLUSIVE,
+                )
+            ],
+        )
+
     try:
         return await run_json_stage_with_timeout(
             agent=incident_analysis_agent,
             payload=payload,
             output_model=IncidentAnalysisOutput,
             user_id=str(payload.session_id),
-            timeout_seconds=120,
+            timeout_seconds=45,
         )
     except Exception:
         pass
 
-    missing_information = [
-        msg
-        for msg in [
-            "we don't have knowledge about this: missing incident evidence"
-            if not payload.evidence
-            else "",
-            "we don't have knowledge about this: missing service metadata"
-            if not payload.services
-            else "",
-            "we don't have knowledge about this: missing documentation evidence"
-            if not payload.docs
-            else "",
-        ]
-        if msg
-    ]
     hypotheses: list[AnalysisHypothesis] = []
-    if payload.evidence or payload.docs:
+    resolution_row = next(
+        (
+            row
+            for row in payload.evidence
+            if any(
+                str(row.get(k) or "").strip()
+                for k in ("root_cause", "root_cause_summary")
+            )
+        ),
+        None,
+    )
+    if resolution_row is not None:
+        root_cause = (
+            str(resolution_row.get("root_cause") or "").strip()
+            or str(resolution_row.get("root_cause_summary") or "").strip()
+        )
+        ref = str(
+            resolution_row.get("id")
+            or resolution_row.get("resolution_id")
+            or payload.incident.get("incident_key")
+            if payload.incident
+            else "resolution-record"
+        )
+        hypotheses.append(
+            AnalysisHypothesis(
+                cause=root_cause,
+                confidence=0.85,
+                supporting_evidence_refs=[f"resolution:{ref}"],
+                counter_evidence_refs=[],
+                reasoning_summary="Root cause extracted from retrieved resolution records.",
+            )
+        )
+    elif payload.evidence or payload.docs:
         source = payload.evidence[0] if payload.evidence else payload.docs[0]
         hypotheses.append(
             AnalysisHypothesis(
@@ -92,6 +175,31 @@ async def analysis_with_adk_or_fallback(
                 counter_evidence_refs=[],
                 reasoning_summary="Fallback analysis using currently retrieved context.",
             )
+        )
+
+    missing_information: list[str] = []
+    if payload.investigation_scope == InvestigationScope.COMPARISON:
+        if not payload.historical_incidents:
+            missing_information.append(
+                "we don't have knowledge about this: missing similar incidents"
+            )
+    elif payload.investigation_scope in {
+        InvestigationScope.INCIDENT,
+        InvestigationScope.REPORT,
+    }:
+        if not (payload.incident or payload.evidence or payload.docs):
+            missing_information.append(
+                "we don't have knowledge about this: missing incident evidence"
+            )
+    elif payload.investigation_scope == InvestigationScope.SERVICE:
+        if not (payload.services or payload.docs or payload.evidence):
+            missing_information.append(
+                "we don't have knowledge about this: missing service metadata"
+            )
+
+    if not hypotheses and not missing_information:
+        missing_information.append(
+            "we don't have knowledge about this: insufficient evidence"
         )
 
     decision = (

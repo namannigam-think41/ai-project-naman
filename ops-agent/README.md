@@ -5,9 +5,10 @@ Standalone Google ADK service for OpsCopilot flow validation.
 ## Architecture
 
 - `app/main.py`: FastAPI endpoints
-- `app/service.py`: pipeline entrypoints
+- `app/service.py`: service entrypoints
+- `app/investigation_entry.py`: shared external investigation entry
 - `app/investigation_flow.py`: end-to-end investigation runtime
-- `app/agents/`: 4-stage agent logic + ADK fallback wrappers
+- `app/agents/`: 4-stage agent logic + ADK roots
 - `app/contracts/`: stage and API contracts
 - `app/tools/`: tool contracts, docs search, tool registry
 - `adk_app/`: ADK web agent exports
@@ -53,7 +54,7 @@ Response:
 
 ## Workflow
 
-`User Query -> OpsCopilotOrchestratorAgent -> Parallel Retrieval -> ContextBuilderAgent -> IncidentAnalysisAgent (loop) -> ResponseComposerAgent -> Structured JSON`
+`User Query -> OpsCopilotOrchestratorAgent -> ContextBuilderAgent -> IncidentAnalysisAgent (loop) -> ResponseComposerAgent -> Structured JSON`
 
 ## Local Run
 
@@ -62,10 +63,15 @@ Response:
 3. `cp .env.example .env` and set `GOOGLE_API_KEY`
 4. `uv run uvicorn app.main:app --reload --port 8010`
 
+Execution note:
+- API `/v1/investigate` executes the shared investigation runtime (`run_investigation_pipeline`).
+- ADK Web uses the graph-visible `root_agent` export from `adk_app/agent.py`.
+- Both paths use the same stage agents and tool contracts.
+
 ## ADK Web Run (Manual Testing)
 
 `ops-agent` includes an ADK-web agents directory at `adk_app/` with one
-agent package: `opscopilot/agent.py`.
+top-level export: `agent.py`.
 
 ```bash
 cd ops-agent
@@ -74,7 +80,7 @@ UV_CACHE_DIR=/tmp/uv-cache uv run adk web adk_app
 ```
 
 Notes:
-- In the ADK selector, choose `opscopilot`.
+- In the ADK selector, choose the single app exported from `adk_app`.
 - This uses Gemini model `gemini-2.5-flash` from your `app/core/config.py`.
 - Ensure `GOOGLE_API_KEY` is set in `ops-agent/.env` before launching.
 

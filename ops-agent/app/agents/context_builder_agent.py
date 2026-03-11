@@ -21,6 +21,8 @@ CONTEXT_BUILDER_PROMPT = """
 You are ContextBuilderAgent.
 Transform retrieval outputs into ContextBuilderOutput JSON only.
 Do not invent facts. If data is missing, say "insufficient information" in open_questions.
+Do not emit markdown/code fences.
+Never output placeholder text like "already processed" or "no more outputs needed".
 """.strip()
 
 context_builder_agent = build_stage_agent(
@@ -43,7 +45,7 @@ async def context_builder_with_adk_or_fallback(
             payload=payload,
             output_model=ContextBuilderOutput,
             user_id=str(payload.user_id),
-            timeout_seconds=120,
+            timeout_seconds=45,
         )
     except Exception:
         pass

@@ -6,17 +6,17 @@ Source of truth for `ops-agent/` implementation.
 
 Build and maintain the simplified OpsCopilot ADK flow:
 
-`User Query -> OpsCopilotOrchestratorAgent -> Parallel Retrieval -> ContextBuilderAgent -> IncidentAnalysisAgent (loop) -> ResponseComposerAgent -> Structured JSON`
+`User Query -> OpsCopilotOrchestratorAgent -> ContextBuilderAgent -> IncidentAnalysisAgent (loop) -> ResponseComposerAgent -> Structured JSON`
 
 ## Current Runtime Structure
 
 - API entry: `app/main.py` (`POST /v1/investigate`)
 - Service entry: `app/service.py::investigate(...)`
-- Pipeline runtime: `app/investigation_flow.py::run_investigation_pipeline(...)`
+- Shared entry routing: `app/investigation_entry.py::run_investigation_entrypoint(...)`
+- Investigation runtime: `app/investigation_flow.py::run_investigation_pipeline(...)`
 - CLI runner: `run_agent.py`
 - ADK web exports:
   - `adk_app/agent.py`
-  - `adk_app/opscopilot/agent.py`
 
 There is no `app/orchestration/` runtime in active flow.
 
@@ -24,8 +24,13 @@ There is no `app/orchestration/` runtime in active flow.
 
 - `app/agents/orchestrator_agent.py`
   - root ADK agent (`root_agent`)
+  - graph root (`OpsCopilotInvestigationFlow`)
   - tool entry (`run_opscopilot_pipeline`)
   - stage planner (`orchestrate_with_adk_or_fallback`)
+
+API routing note:
+- `run_investigation_via_root_agent(...)` now delegates directly to `run_investigation_pipeline(...)` for deterministic API behavior.
+- ADK Web remains graph-driven via `root_agent` export.
 - `app/agents/context_builder_agent.py`
 - `app/agents/incident_analysis_agent.py`
 - `app/agents/response_composer_agent.py`
@@ -74,7 +79,7 @@ All stage I/O must validate against contracts.
 
 - `ops-agent` returns structured response payload.
 - Backend `server` owns DB persistence of assistant output.
-- Do not add persistence side-effects inside `ops-agent` pipeline runtime.
+- Do not add persistence side-effects inside `ops-agent` investigation runtime.
 
 ## Commands
 
