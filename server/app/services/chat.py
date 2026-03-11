@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Message, Session
 from app.services.agent_client import AgentClientError, investigate_ops_agent
+from app.services.presentation import enrich_structured_with_presentation
 
 logger = logging.getLogger(__name__)
 
@@ -189,6 +190,9 @@ async def create_chat_turn(
         )
         reply_text = ASSISTANT_FALLBACK_REPLY
         assistant_structured = build_assistant_structured_payload(reply_text)
+    assistant_structured = enrich_structured_with_presentation(
+        assistant_structured, fallback_summary=reply_text
+    )
     assistant_message = await add_assistant_message(
         db,
         session=session,

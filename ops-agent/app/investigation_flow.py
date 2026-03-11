@@ -29,7 +29,7 @@ from app.tools.agent_tools import (
     load_session_messages,
     search_docs,
 )
-from app.tools.contracts import make_no_data_response
+from app.tools.contracts import make_error_response, make_no_data_response
 
 logger = logging.getLogger(__name__)
 ToolFn = Callable[..., dict[str, Any]]
@@ -80,7 +80,17 @@ async def run_investigation_pipeline(
 ) -> InvestigationResult:
     trace_id = str(uuid4())
     logs: list[dict] = []
-    session_uuid = UUID(session_id)
+    try:
+        session_uuid = UUID(session_id)
+    except ValueError:
+        return _error_result(
+            trace_id=trace_id,
+            logs=logs,
+            code=PipelineErrorCode.TOOL_EXECUTION_FAILED,
+            status="error",
+            message="invalid session_id format; expected UUID string",
+            next_action="retry with a valid session_id UUID",
+        )
 
     async def _run() -> InvestigationResult:
         try:
@@ -375,6 +385,7 @@ async def _fan_out_retrieval(
             merged["historical_incidents"].extend(data)
         elif tool_name == "get_resolutions":
             merged["resolutions"].extend(data)
+            merged["evidence"].extend(data)
         elif tool_name == "load_session_messages":
             merged["session_history"].extend(data)
         elif tool_name == "search_docs":
@@ -390,7 +401,16 @@ async def _run_plan_item(item: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         return tool_name, make_no_data_response(tool_name).model_dump()
     if any(str(v).startswith("$from_incident_services") for v in args.values()):
         return tool_name, make_no_data_response(tool_name).model_dump()
-    return tool_name, fn(**args)
+    cleaned_args = {k: v for k, v in args.items() if v is not None}
+    try:
+        return tool_name, fn(**cleaned_args)
+    except TypeError:
+        # ADK planner can emit incomplete args for some tools; skip safely.
+        return tool_name, make_no_data_response(tool_name).model_dump()
+    except Exception as exc:
+        return tool_name, make_error_response(
+            tool_name, "TOOL_EXECUTION_FAILED", str(exc)
+        ).model_dump()
 
 
 def _tool_registry() -> dict[str, ToolFn]:
@@ -445,7 +465,7 @@ def _build_followup_plan(
         plan.append(
             {
                 "tool": "get_similar_incidents",
-                "args": {"incident_key": incident_key, "limit": 5},
+                "args": {"incident_key": incident_key},
             }
         )
     if ("service" in msg or "dependency" in msg) and service_name:

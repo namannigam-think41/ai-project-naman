@@ -20,10 +20,8 @@ export function ChatPage() {
     groupedSessions,
     selectedSession,
     sessionMessages,
-    searchQuery,
     draft,
     isSending,
-    setSearchQuery,
     setDraft,
     selectSession,
     createNewChat,
@@ -54,8 +52,6 @@ export function ChatPage() {
     <Sidebar
       groups={groupedSessions}
       activeSessionId={selectedSession?.id ?? null}
-      searchQuery={searchQuery}
-      onSearchQueryChange={setSearchQuery}
       onSelectSession={(sessionId) => {
         selectSession(sessionId);
         setMobileOpen(false);
@@ -71,42 +67,46 @@ export function ChatPage() {
   );
 
   return (
-    <Stack sx={{ minHeight: "100vh", bgcolor: "#050d24" }} direction="row">
-      {isDesktop ? (
-        sidebar
-      ) : (
-        <Drawer open={mobileOpen} onClose={() => setMobileOpen(false)}>
-          {sidebar}
-        </Drawer>
-      )}
+    <Stack sx={{ minHeight: "100vh", bgcolor: "#050d24" }}>
+      <ChatHeader onLogout={logout} />
 
-      <Stack sx={{ flex: 1, minWidth: 0 }} component="main">
-        <Stack
-          direction="row"
-          alignItems="center"
-          sx={{
-            borderBottom: "1px solid #1b2b48",
-            bgcolor: "#09142f",
-            px: 1,
-            py: 0.7,
-            display: { lg: "none" },
-          }}
-        >
-          <IconButton aria-label="Open chat sessions" onClick={() => setMobileOpen(true)}>
-            <MenuRoundedIcon sx={{ color: "#9fb8e2" }} fontSize="small" />
-          </IconButton>
+      <Stack direction="row" sx={{ flex: 1, minHeight: 0 }}>
+        {isDesktop ? (
+          sidebar
+        ) : (
+          <Drawer open={mobileOpen} onClose={() => setMobileOpen(false)}>
+            {sidebar}
+          </Drawer>
+        )}
+
+        <Stack sx={{ flex: 1, minWidth: 0, minHeight: 0 }} component="main">
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{
+              borderBottom: "1px solid #1b2b48",
+              bgcolor: "#09142f",
+              px: 1,
+              py: 0.7,
+              display: { lg: "none" },
+            }}
+          >
+            <IconButton aria-label="Open chat sessions" onClick={() => setMobileOpen(true)}>
+              <MenuRoundedIcon sx={{ color: "#9fb8e2" }} fontSize="small" />
+            </IconButton>
+          </Stack>
+
+          <Box ref={messagesContainerRef} sx={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+            <MessageList messages={sessionMessages} isThinking={isSending} />
+          </Box>
+
+          <Composer
+            value={draft}
+            isSending={isSending}
+            onChange={setDraft}
+            onSend={() => sendMessage()}
+          />
         </Stack>
-
-        <ChatHeader
-          title={selectedSession?.title ?? "No Active Investigation"}
-          onLogout={logout}
-        />
-
-        <Box ref={messagesContainerRef} sx={{ flex: 1, overflowY: "auto" }}>
-          <MessageList messages={sessionMessages} />
-        </Box>
-
-        <Composer value={draft} isSending={isSending} onChange={setDraft} onSend={() => sendMessage()} />
       </Stack>
     </Stack>
   );

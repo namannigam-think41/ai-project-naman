@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from app.investigation_entry import run_investigation_entrypoint
+from app.agents.orchestrator_agent import run_investigation_via_root_agent
 from app.investigation_flow import InvestigationResult
 
 
-async def investigate(
+async def run_investigation_entrypoint(
     *,
     request_id: str,
     session_id: str,
@@ -13,7 +13,10 @@ async def investigate(
     incident_key: str | None = None,
     service_name: str | None = None,
 ) -> InvestigationResult:
-    return await run_investigation_entrypoint(
+    """
+    Shared service/API entrypoint.
+    """
+    return await run_investigation_via_root_agent(
         request_id=request_id,
         session_id=session_id,
         user_id=user_id,

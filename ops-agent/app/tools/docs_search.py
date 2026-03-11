@@ -12,6 +12,21 @@ from app.tools.contracts import (
 )
 
 _INDEX_RELATIVE = Path("resources/index.json")
+_CATEGORY_ALIASES = {
+    "policy": "policies",
+    "policies": "policies",
+    "runbook": "runbooks",
+    "runbooks": "runbooks",
+    "postmortem": "postmortems",
+    "postmortems": "postmortems",
+    "architecture": "architecture",
+}
+_CATEGORY_KEYWORDS: tuple[tuple[str, str], ...] = (
+    ("policy", "policies"),
+    ("runbook", "runbooks"),
+    ("postmortem", "postmortems"),
+    ("architecture", "architecture"),
+)
 
 
 def search_docs(
@@ -53,14 +68,34 @@ def _filter_docs(
     category: str | None,
     service: str | None,
 ) -> list[dict[str, Any]]:
+    normalized_category = _normalize_category(category)
     out: list[dict[str, Any]] = []
     for doc in docs:
-        if category and str(doc.get("category", "")).lower() != category.lower():
+        doc_category = _normalize_category(str(doc.get("category", "")))
+        if normalized_category and doc_category != normalized_category:
             continue
         if service and str(doc.get("service", "")).lower() != service.lower():
             continue
         out.append(doc)
     return out
+
+
+def _normalize_category(category: str | None) -> str | None:
+    if not category:
+        return None
+    lowered = category.strip().lower()
+    if not lowered:
+        return None
+    direct = _CATEGORY_ALIASES.get(lowered)
+    if direct:
+        return direct
+
+    # ADK planner may emit phrase-like categories, e.g. "incident response policy".
+    for keyword, canonical in _CATEGORY_KEYWORDS:
+        if keyword in lowered:
+            return canonical
+
+    return lowered
 
 
 def _rank_docs(

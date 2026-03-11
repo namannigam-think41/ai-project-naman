@@ -1,5 +1,3 @@
-import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
-import MicNoneRoundedIcon from "@mui/icons-material/MicNoneRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import {
   IconButton,
@@ -29,7 +27,18 @@ export function Composer({ value, isSending, onChange, onSend }: ComposerProps) 
   }, [value]);
 
   return (
-    <Stack sx={{ px: { xs: 1.2, md: 0 }, pb: { xs: 1.2, md: 1.8 }, bgcolor: "#050d24" }}>
+    <Stack
+      sx={{
+        position: "sticky",
+        bottom: 0,
+        zIndex: 2,
+        px: { xs: 1.2, md: 0 },
+        pb: { xs: 1.2, md: 1.8 },
+        pt: 1,
+        bgcolor: "#050d24",
+        borderTop: "1px solid #1b2b48",
+      }}
+    >
       <Paper
         elevation={0}
         sx={{
@@ -44,10 +53,6 @@ export function Composer({ value, isSending, onChange, onSend }: ComposerProps) 
         }}
       >
         <Stack direction="row" spacing={0.5} alignItems="flex-end">
-          <IconButton aria-label="Attach file" size="small" sx={{ color: "#89a3cf" }}>
-            <AttachFileRoundedIcon fontSize="small" />
-          </IconButton>
-
           <TextField
             multiline
             fullWidth
@@ -77,24 +82,21 @@ export function Composer({ value, isSending, onChange, onSend }: ComposerProps) 
             }}
           />
 
-          <IconButton aria-label="Voice input" size="small" sx={{ color: "#89a3cf" }}>
-            <MicNoneRoundedIcon fontSize="small" />
-          </IconButton>
-
           <IconButton
             aria-label="Send message"
-            size="small"
+            size="medium"
             onClick={onSend}
             disabled={isSending || value.trim().length === 0}
             sx={{
               bgcolor: "rgba(255, 255, 255, 0.1)",
               color: "#a7bde6",
-              width: 30,
-              height: 30,
+              width: 40,
+              height: 40,
+              alignSelf: "center",
               "&:hover": { bgcolor: "rgba(255, 255, 255, 0.16)" },
             }}
           >
-            <SendRoundedIcon sx={{ fontSize: 16 }} />
+            <SendRoundedIcon sx={{ fontSize: 22 }} />
           </IconButton>
         </Stack>
       </Paper>

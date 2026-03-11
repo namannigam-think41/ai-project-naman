@@ -1,6 +1,6 @@
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
-import { ButtonBase, IconButton, Stack, Typography } from "@mui/material";
+import { ButtonBase, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import type { ChatSession } from "@/types/chat";
 
 interface SessionItemProps {
@@ -28,8 +28,8 @@ export function SessionItem({ session, isActive, onClick, onDelete }: SessionIte
       onClick={() => onClick(session.id)}
       sx={{
         width: "100%",
-        py: 1,
-        px: 1.2,
+        py: "10px",
+        px: "12px",
         borderRadius: 1.6,
         textAlign: "left",
         alignItems: "flex-start",
@@ -44,12 +44,23 @@ export function SessionItem({ session, isActive, onClick, onDelete }: SessionIte
         },
       }}
     >
-      <Stack direction="row" spacing={1.2} width="100%">
+      <Stack direction="row" spacing={1.2} width="100%" alignItems="flex-start">
         <ChatBubbleOutlineRoundedIcon sx={{ color: "#8ca7d4", fontSize: 18, mt: 0.2 }} />
-        <Stack spacing={0.2} minWidth={0}>
-          <Typography variant="body2" sx={{ color: "#c7d6f2", fontWeight: 600 }} noWrap>
-            {session.title}
-          </Typography>
+        <Stack spacing={0.2} minWidth={0} sx={{ flex: 1, pr: 0.6 }}>
+          <Tooltip title={session.title} placement="top" arrow>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#c7d6f2",
+                fontWeight: 600,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {session.title}
+            </Typography>
+          </Tooltip>
           <Typography variant="caption" sx={{ color: "#6781b0" }}>
             {formatLastUpdated(session.lastActivityAt)}
           </Typography>
@@ -61,9 +72,13 @@ export function SessionItem({ session, isActive, onClick, onDelete }: SessionIte
             event.stopPropagation();
             onDelete(session.id);
           }}
-          sx={{ color: "#8ca7d4", ml: "auto" }}
+          sx={{
+            color: "#c9dcff",
+            mt: -0.2,
+            "&:hover": { color: "#ffffff", bgcolor: "rgba(255,255,255,0.1)" },
+          }}
         >
-          <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} />
+          <DeleteOutlineRoundedIcon sx={{ fontSize: 17 }} />
         </IconButton>
       </Stack>
     </ButtonBase>
