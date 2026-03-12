@@ -226,7 +226,20 @@ def _first_non_empty_str(*values: object) -> str:
 def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text
-    return text[: max_len - 1].rstrip() + "..."
+    sentence_end = re.search(r"[.!?](?=\s|$)", text[max_len : max_len + 140])
+    if sentence_end:
+        end = max_len + sentence_end.end()
+        return text[:end].strip()
+
+    cut = text[:max_len]
+    endings = list(re.finditer(r"[.!?](?=\s|$)", cut))
+    if endings and endings[-1].end() >= int(max_len * 0.55):
+        return cut[: endings[-1].end()].strip()
+
+    boundary = cut.rfind(" ")
+    if boundary > 0:
+        return cut[:boundary].strip()
+    return cut.strip()
 
 
 def _source_label(source: str) -> str:
