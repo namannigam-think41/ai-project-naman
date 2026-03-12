@@ -1,0 +1,673 @@
+{
+  "eval_set_id": "evalTest",
+  "name": "evalTest",
+  "eval_cases": [
+    {
+      "eval_id": "case459533",
+      "conversation": [
+        {
+          "invocation_id": "e-95b367e0-b9ec-49cd-b065-996d9a074efc",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Compare INC-2026-0001 with similar incidents and summarize what was different."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "{\n  \"summary\": \"INC-2026-0001 ('Checkout failures due to payment timeout') and INC-2026-0004 ('Payment service outage affecting order placement') were both sev1 incidents involving the payment service and leading to checkout failures. The primary difference is the nature of the problem: INC-2026-0001 was specifically caused by a misconfigured HTTP client timeout in `payment-service` and resolved by a rollback and timeout increase. In contrast, INC-2026-0004 was a more general 'Payment API downtime' for which specific root cause and resolution details are currently unavailable. INC-2026-0004 also lasted 12 minutes longer (65 minutes vs. 53 minutes).\",\n  \"report\": {\n    \"findings\": [\n      \"INC-2026-0001 was a SEV1 incident titled 'Checkout failures due to payment timeout', lasting 53 minutes (2026-03-05T09:12:00 - 2026-03-05T10:05:00). Its root cause was a misconfigured HTTP client timeout in the `payment-service`, leading to cascading retries. The incident was resolved by rolling back `payment-service v2026.03.05.1` and increasing the timeout budget to 3.5s, restoring checkout success rate to 99.2%. [evidence_1, evidence_2]\",\n      \"A similar incident, INC-2026-0004, titled 'Payment service outage affecting order placement', was also a SEV1 incident. It lasted 65 minutes (2026-03-08T11:05:00 - 2026-03-08T12:10:00) and involved 'Payment API downtime' causing checkout failures and degraded order flow. [evidence_0, evidence_3]\",\n      \"Both incidents were similar in their severity (sev1) and involvement of the payment service leading to checkout issues. [evidence_0, evidence_1, evidence_3]\",\n      \"Key differences include: (1) INC-2026-0001 was a timeout-specific issue from a misconfigured HTTP client, while INC-2026-0004 was a broader 'Payment API downtime'. (2) INC-2026-0004 had a longer duration of 65 minutes compared to INC-2026-0001's 53 minutes. (3) The specific root cause and resolution details are documented for INC-2026-0001 but are not available for INC-2026-0004. [evidence_1, evidence_2, evidence_3, evidence_4]\"\n    ],\n    \"inferred_considerations\": [],\n    \"gaps_unknowns\": [\n      \"The specific root cause and detailed resolution actions for INC-2026-0004 are not available in the provided incident records. This makes a full comparison of underlying issues and resolution strategies challenging.\"\n    ]\n  },\n  \"recommended_actions\": [\n    {\n      \"owner\": \"Incident Commander (INC-2026-0004)\",\n      \"description\": \"Review and update the resolution details for INC-2026-0004 to include the specific root cause and actions taken, ensuring complete historical records for future analysis.\",\n      \"priority\": 1\n    },\n    {\n      \"owner\": \"Payment Service Team\",\n      \"description\": \"Investigate potential shared vulnerabilities or patterns between the 'misconfigured HTTP client timeout' (INC-2026-0001) and the 'Payment API downtime' (INC-2026-0004) to prevent recurrence of similar payment-related outages.\",\n      \"priority\": 2\n    },\n    {\n      \"owner\": \"SRE/Platform Team\",\n      \"description\": \"Implement automated checks for `payment-service` HTTP client timeout configurations as part of release pipelines to prevent misconfigurations that led to INC-2026-0001.\",\n      \"priority\": 3\n    }\n  ],\n  \"status\": \"complete\"\n}"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-ed6af89b-abea-49f9-8a20-1b3c2d212d1d",
+                        "args": {
+                          "incident_key": "INC-2026-0001"
+                        },
+                        "name": "get_similar_incidents"
+                      },
+                      "thought_signature": "CtcEAb4-9vtrGDh44aTJkCkiDQTZMkd4JGBUpldNKFrgrO1Gim0MTCn-NnqMzIu5f3d2xLBym7oi0N9XbS_Ck9t_4aS0FKsWeoXkNhLmi4GH13mS6dhI4EEvcldgHHOmP_wF6JoN_lwMAh4CdsVOuFT6Gcm_d3xi-YT47dsQUGCg1lALcfmGDVGBelZWuM6lzLztcZuVS8aeymygPrlLswSD-RwhnptMoL2yXv7MARdNAsaPy3QPyulFd9pfbzw8fa3tNLWk9o59cmus8gBnapKh3fk2RDFiduUkRaJiq7gbj23eMkYcqQIyd6xxPgbORSlL7ETb933cnUc59EX8uufoR_ys6dhqKjnWUN-YN-pOhTSdOmsXiLliX-46j0aeAFRYV3j5TUqL0cdJ9HLOw0dgnXVW_K7Nd3C-WRjto-hEf9hm2_CcxooYrfCGJtdlE01luDf9Y9LtkwRHJgV3eUWRRtQpjcrKfidgN4oQ13-xBgX5JXDFccnuu04JRRrugNzoAEcxfX7JopuPEu_ws4VvLCYvoYKk9py5Eg3oqp-XClQxYuI9YbZ7Y4d0maztKYLo8_Gk0I_t0kUvPPEdN6E7HEgYL_iL28CI2qXAjui5g6uDdUG3gk7LgX89ZquJrBRqYQu6Cnm1utC-Sn48DWy5irSp1fIdAWcCN_1ez3nhb6D6TJv0ae5JunzC0b994v-86OVFSsfh_l53BzKh3_cF809gvOLY9dwyF6mAD4DOkcOfhb6_5xMkHuBjucLOixnqhbgx5j59gCpvIyQgPfpn6UpgpiZwimw="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-ed6af89b-abea-49f9-8a20-1b3c2d212d1d",
+                        "name": "get_similar_incidents",
+                        "response": {
+                          "ok": true,
+                          "data": [
+                            {
+                              "incident_key": "INC-2026-0004",
+                              "title": "Payment service outage affecting order placement",
+                              "status": "resolved",
+                              "severity": "sev1",
+                              "service_overlap_count": 2,
+                              "similarity_reason": "service_overlap"
+                            }
+                          ],
+                          "error": null,
+                          "source": "get_similar_incidents"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-2e25cbb7-84a0-45e4-820a-6df974b978c4",
+                        "args": {
+                          "incident_key": "INC-2026-0001"
+                        },
+                        "name": "get_incident_by_key"
+                      },
+                      "thought_signature": "CtQEAb4-9vteKGhC_rNGdJSMprglie_lilCT0HnLa2nhqOyb3iQcH0x0eH3jf3O52ZQzuU0yr3VSErWqUFlRmWkQrczeDKddRXuUFvoBfQSeVwolPgrCowD_sEJ-kZh42zIbxlZTM3KI78XcmL4gP404T4rr-FYf17W83q0XI1vCqGch_812tGF7v1XRkidbuIiSbkcB-99lk19eQZ8pcS7AweD4l720dmOfzagCZPbZK_M5dv2WXmtJuv1pO5InGluuut4oth5pg7-PAxzUvbGNVPhW6518j_3oLSLWOLVo8KL3GKS2A4_pJXxZWRz_Y8BsaTkLNBPBFAizbz8gaz-mCAfsKIUhQxE0X3KGNJ_V7SYW8_Ix2AhbtKPjHyI4dn-ImOBw2B2wBS8vPFcCD2Wm7shP-7KWWznbBwE96l8cLaBxB2_t_CHPCB_5ezONPU_mew5wYm6G_l8_i0LTk_Z9JwmIlu04H0lMyoRdZK9bnLTKXH9gZtbd4jW-HaO9oKYWQAQNagdViw50_6xml8Y9Os2OW-N_3jEIxvk0uMKlYBAaw9zq13qWNyNZufGRq2Cnm3F4CYXXdsGsA9s1Y_a4gwViThx0qGn9mactgG-84p75gkWiNGlks_aYMUGPjAN3KMcYKI4c_JKv4NwWjxaEh0TGLB3Zol7CYouz95V3LJG9_pizskZSueed19IU4Gon3yWMiC2KI7uJe0Z4UGxPNi745tPgIX1dBRInyoKqBJ9mkTHIrxzXwJ-Dzcox_KTumd4lp7jYW2_7NSrdrPnIf8cQi5Y="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-2e25cbb7-84a0-45e4-820a-6df974b978c4",
+                        "name": "get_incident_by_key",
+                        "response": {
+                          "ok": true,
+                          "data": {
+                            "id": 1,
+                            "incident_key": "INC-2026-0001",
+                            "title": "Checkout failures due to payment timeout",
+                            "status": "resolved",
+                            "severity": "sev1",
+                            "started_at": "2026-03-05T09:12:00",
+                            "resolved_at": "2026-03-05T10:05:00",
+                            "summary": "Customers could not complete checkout for 53 minutes.",
+                            "created_by_user_id": 1,
+                            "commander_user_id": 2
+                          },
+                          "error": null,
+                          "source": "get_incident_by_key"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-7c5e76af-5f71-46f3-b693-a3cad57e689d",
+                        "args": {
+                          "incident_key": "INC-2026-0001"
+                        },
+                        "name": "get_resolutions"
+                      },
+                      "thought_signature": "Cr4CAb4-9vuBgwwt0TTv9Pe7Tf1xFUu8KFSSDeri6nmOGpo_fujjcdWR8vUxaqnO_tGK17Ka9Sq_eeE4fMIdgTNA_Pljf4TOf0Rb13sCVL5yhw3-7m5GmX6XRfrZ1QMPpTsHYjYJMbd_7mngy6NN_mHCgmIh-WI_X1KYFpIPKzaSSvFI4Hd8wVsrrsw91ZZxOInD5kTeYvMCSR2pa5qGJ8i3aNn78UNC2nFjgLpcNmOU0lxYHyDWVToigUrwyd4tpKq-JWUxTx3w44gpVuIIadkPF3VZVPV5ydP1Dm2q_lIUeM7dpdy-cgsxANhNOABWOj78GhiSLZLtH2WrBKfeI7QMWe26SaM3lqgtHhuiwsJ_VDQfZFpQydgV-eEGaNhhQ5uBU0USphMgn1Jtk9E5lf2C-FdoV6DuU8n22g0llVKr"
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-7c5e76af-5f71-46f3-b693-a3cad57e689d",
+                        "name": "get_resolutions",
+                        "response": {
+                          "ok": true,
+                          "data": [
+                            {
+                              "id": 1,
+                              "incident_id": 1,
+                              "resolution_summary": "Rolled back payment-service release and increased timeout budget.",
+                              "root_cause": "A misconfigured HTTP client timeout in payment-service caused cascading retries.",
+                              "actions_taken_json": {
+                                "rollback": "payment-service v2026.03.05.1",
+                                "hotfix": "timeout config set to 3.5s",
+                                "verification": "checkout success rate restored to 99.2%"
+                              },
+                              "resolved_by_user_id": 2,
+                              "resolved_at": "2026-03-05T10:05:00"
+                            }
+                          ],
+                          "error": null,
+                          "source": "get_resolutions"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-0a7654b3-2cef-4df5-a8bb-774bf584bd31",
+                        "args": {
+                          "incident_key": "INC-2026-0004"
+                        },
+                        "name": "get_incident_by_key"
+                      },
+                      "thought_signature": "CsgDAb4-9vsXPcp-qHOhCX20Uvgu6qofGfGm2tiqLAdFpkjJjE4n14P2Pq5YU-16AjUVo6gWnij-aN-n1_jg_8pg76IqywpYRSE66Milc54qh-oPaNsnAba7a54InYBuouKyoNoMbQyfc4fpmF34PJXp0liQeVQXJN2fvyDrvSGwGjJ4Zo-opkn3iIER2Lfep48cb58rR2dyJCriRpPYnlvfkoj90nafPEXcCZD3HCs271ScdfGffO6iKwTQ_S4efyfsz5LnX3OIS9NPic9c5at1G5cyycjwzJHR3dQfl-FsNomD4A3SsTuWVK2xmU_ZcXWcPZjzIDv6GCex724n-cdYBj9ZgQMhgqslsx2NrPVjlRRq5hUq261g0RpR3GxSlzTr-UgaC8O7Mb7mLPElZ7XrsS_jG3IdlxgyAHVZEJmeYqXqrumxHBM-hkEfoy4fznnLAs2Gy3v7KEVK4t6i0SAyTI-fBNQm2FYmr1E-gqdfjAmpTgtJmSJL7UMzpvv0bGYZ8iWh9H5DHvqz1Cy5k9CjYfxzkjwFNBt8bLfAUoaX93pXSwxqvYLkxnyeTX3sKts7EBVpKm_QHsZI_pipq5ztJM1Kkrv77oSM"
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-0a7654b3-2cef-4df5-a8bb-774bf584bd31",
+                        "name": "get_incident_by_key",
+                        "response": {
+                          "ok": true,
+                          "data": {
+                            "id": 4,
+                            "incident_key": "INC-2026-0004",
+                            "title": "Payment service outage affecting order placement",
+                            "status": "resolved",
+                            "severity": "sev1",
+                            "started_at": "2026-03-08T11:05:00",
+                            "resolved_at": "2026-03-08T12:10:00",
+                            "summary": "Payment API downtime caused checkout failures and degraded order flow.",
+                            "created_by_user_id": 2,
+                            "commander_user_id": 1
+                          },
+                          "error": null,
+                          "source": "get_incident_by_key"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-ca5f5981-3cc3-4b2e-a89b-40e9e32d1a54",
+                        "args": {
+                          "incident_key": "INC-2026-0004"
+                        },
+                        "name": "get_resolutions"
+                      },
+                      "thought_signature": "CpYDAb4-9vvZwlO_8_ztBCtXrtn7PC10AbaGyHPxfV7ZkFyPYO-fH1BCP4udp52h3RD2k1M6Pdk9yxJX8Rr0oPHaMjnZmY558Cu7IOe2KmySXeJjOytLazaQjrpKH4IU8fT7HAT2GbLmA5I6glD3EMGUDNB20bG9pcP3Efd7HJbOLDMFZTGIogS3hdarcC197l5hodXLZ_I3V54DbikaXLA21Cs9nmH9AvPMyhQbyx3uFkGW4L1H4-E57xz9vDeqe6A5kZJ_SFA5d1NWVcHorAw6ZwHdv1uXtLA04xPreW2agvEuu4oDqB-w2e6ZFsYL-yCnCnggpEoLodCK8hDcaoEcG4v2_k49YaWyTHmbu63CKz3x9LdyI-iZWM0fPQYP72hqE-h2TN1Ao0E1_uvVe6tsmtHhEONC3u_9tkYtyhRcckkXKSQM50fIMXrFuULvA0a5oLflyB6-S8ADehWRFzm4XuWOdWxv6YtIdgB8vrK5hjAQIi44red9Tfhrv4E-WPruQmDWbg8BUad2VqJfkH0hxu9thewYeA=="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-ca5f5981-3cc3-4b2e-a89b-40e9e32d1a54",
+                        "name": "get_resolutions",
+                        "response": {
+                          "ok": true,
+                          "data": [],
+                          "error": null,
+                          "source": "get_resolutions"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              }
+            ]
+          },
+          "creation_timestamp": 1773298048.683678
+        }
+      ],
+      "session_input": {
+        "app_name": "adk_app",
+        "user_id": "user"
+      },
+      "creation_timestamp": 1773298118.7034516
+    },
+    {
+      "eval_id": "casef6e905",
+      "conversation": [
+        {
+          "invocation_id": "e-1e56f729-3420-460a-891b-cc94dda71f9d",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Compare INC-2026-0001 with similar incidents and summarize what was different."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "INC-2026-0001, a 'sev1' incident involving checkout failures due to payment service timeouts, shared similarities with INC-2026-0004, another 'sev1' payment service outage affecting order placement. Both incidents were resolved and impacted the payment service, leading to checkout issues. However, INC-2026-0001 had a clearly defined root cause: a misconfigured HTTP client timeout in the `payment-service` which was resolved by rolling back a release and increasing the timeout budget. In contrast, the specific root cause and resolution actions for INC-2026-0004 are not detailed beyond a general \"Payment API downtime.\" Additionally, INC-2026-0004 lasted 65 minutes, which was 12 minutes longer than INC-2026-0001's 53-minute duration.\n\n```json\n{\n  \"status\": \"complete\",\n  \"summary\": \"INC-2026-0001, a 'sev1' incident involving checkout failures due to payment service timeouts, shared similarities with INC-2026-0004, another 'sev1' payment service outage affecting order placement. Both incidents were resolved and impacted the payment service, leading to checkout issues. However, INC-2026-0001 had a clearly defined root cause: a misconfigured HTTP client timeout in the `payment-service` which was resolved by rolling back a release and increasing the timeout budget. In contrast, the specific root cause and resolution actions for INC-2026-0004 are not detailed beyond a general \\\"Payment API downtime.\\\" Additionally, INC-2026-0004 lasted 65 minutes, which was 12 minutes longer than INC-2026-0001's 53-minute duration.\",\n  \"report\": {\n    \"evidence_backed_findings\": [\n      \"Both INC-2026-0001 and INC-2026-0004 were classified as 'sev1' incidents, involved issues with the payment service, and resulted in checkout failures or degraded order flow. Both were successfully resolved. (Evidence: INC-2026-0001-details, INC-2026-0004-details)\",\n      \"INC-2026-0001 was rooted in a misconfigured HTTP client timeout within the `payment-service`, leading to cascading retries and checkout failures. Its resolution involved rolling back `payment-service` v2026.03.05.1 and setting the timeout configuration to 3.5 seconds. (Evidence: INC-2026-0001-details)\",\n      \"INC-2026-0004 was characterized as 'Payment API downtime' causing checkout failures and degraded order flow. (Evidence: INC-2026-0004-details)\",\n      \"INC-2026-0001 had a duration of 53 minutes, from 2026-03-05T09:12:00 to 2026-03-05T10:05:00. (Evidence: INC-2026-0001-details)\",\n      \"INC-2026-0004 had a longer duration of 65 minutes, from 2026-03-08T11:05:00 to 2026-03-08T12:10:00. (Evidence: INC-2026-0004-details)\"\n    ],\n    \"inferred_considerations\": [],\n    \"gaps_unknowns\": [\n      \"The specific root cause and detailed resolution actions for INC-2026-0004 are not available in the provided information.\"\n    ]\n  },\n  \"recommended_actions\": [\n    {\n      \"owner\": \"Incident Management Team\",\n      \"action\": \"Investigate and document the specific root cause and detailed resolution actions for INC-2026-0004 to ensure complete incident records.\",\n      \"impact\": \"High\",\n      \"urgency\": \"High\"\n    },\n    {\n      \"owner\": \"SRE Team / Incident Commander\",\n      \"action\": \"Review current incident post-mortem processes, especially for `payment-service` related incidents, to ensure consistent and thorough documentation of root causes and resolution steps.\",\n      \"impact\": \"Medium\",\n      \"urgency\": \"Medium\"\n    },\n    {\n      \"owner\": \"Platform Engineering Team\",\n      \"action\": \"Analyze historical `payment-service` incidents for recurring patterns in root causes (e.g., timeout misconfigurations, API downtime) to identify and address systemic weaknesses.\",\n      \"impact\": \"High\",\n      \"urgency\": \"Medium\"\n    }\n  ],\n  \"__meta__\": {\n    \"tool_code_results\": [\n      {\n        \"tool_code\": \"print(default_api.get_similar_incidents(incident_key = \\\"INC-2026-0001\\\"))\",\n        \"result\": {\n          \"get_similar_incidents_response\": {\n            \"data\": [\n              {\n                \"incident_key\": \"INC-2026-0004\",\n                \"service_overlap_count\": 2,\n                \"severity\": \"sev1\",\n                \"similarity_reason\": \"service_overlap\",\n                \"status\": \"resolved\",\n                \"title\": \"Payment service outage affecting order placement\"\n              }\n            ],\n            \"error\": null,\n            \"ok\": true,\n            \"source\": \"get_similar_incidents\"\n          }\n        }\n      },\n      {\n        \"tool_code\": \"print(default_api.get_incident_by_key(incident_key = \\\"INC-2026-0001\\\"))\",\n        \"result\": {\n          \"get_incident_by_key_response\": {\n            \"data\": {\n              \"commander_user_id\": 2,\n              \"created_by_user_id\": 1,\n              \"id\": 1,\n              \"incident_key\": \"INC-2026-0001\",\n              \"resolved_at\": \"2026-03-05T10:05:00\",\n              \"severity\": \"sev1\",\n              \"started_at\": \"2026-03-05T09:12:00\",\n              \"status\": \"resolved\",\n              \"summary\": \"Customers could not complete checkout for 53 minutes.\",\n              \"title\": \"Checkout failures due to payment timeout\"\n            },\n            \"error\": null,\n            \"ok\": true,\n            \"source\": \"get_incident_by_key\"\n          }\n        }\n      },\n      {\n        \"tool_code\": \"print(default_api.get_resolutions(incident_key = \\\"INC-2026-0001\\\"))\",\n        \"result\": {\n          \"get_resolutions_response\": {\n            \"data\": [\n              {\n                \"actions_taken_json\": {\n                  \"hotfix\": \"timeout config set to 3.5s\",\n                  \"rollback\": \"payment-service v2026.03.05.1\",\n                  \"verification\": \"checkout success rate restored to 99.2%\"\n                },\n                \"id\": 1,\n                \"incident_id\": 1,\n                \"resolution_summary\": \"Rolled back payment-service release and increased timeout budget.\",\n                \"resolved_at\": \"2026-03-05T10:05:00\",\n                \"resolved_by_user_id\": 2,\n                \"root_cause\": \"A misconfigured HTTP client timeout in payment-service caused cascading retries.\"\n              }\n            ],\n            \"error\": null,\n            \"ok\": true,\n            \"source\": \"get_resolutions\"\n          }\n        }\n      },\n      {\n        \"tool_code\": \"print(default_api.get_incident_by_key(incident_key = \\\"INC-2026-0004\\\"))\",\n        \"result\": {\n          \"get_incident_by_key_response\": {\n            \"data\": {\n              \"commander_user_id\": 1,\n              \"created_by_user_id\": 2,\n              \"id\": 4,\n              \"incident_key\": \"INC-2026-0004\",\n              \"resolved_at\": \"2026-03-08T12:10:00\",\n              \"severity\": \"sev1\",\n              \"started_at\": \"2026-03-08T11:05:00\",\n              \"status\": \"resolved\",\n              \"summary\": \"Payment API downtime caused checkout failures and degraded order flow.\",\n              \"title\": \"Payment service outage affecting order placement\"\n            },\n            \"error\": null,\n            \"ok\": true,\n            \"source\": \"get_incident_by_key\"\n          }\n        }\n      },\n      {\n        \"tool_code\": \"print(default_api.get_resolutions(incident_key = \\\"INC-2026-0004\\\"))\",\n        \"result\": {\n          \"get_resolutions_response\": {\n            \"data\": [],\n            \"error\": null,\n            \"ok\": true,\n            \"source\": \"get_resolutions\"\n          }\n        }\n      }\n    ]\n  }\n}\n```"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-334df22e-ae7a-4ad2-9def-d20e6ad5952b",
+                        "args": {
+                          "incident_key": "INC-2026-0001"
+                        },
+                        "name": "get_similar_incidents"
+                      },
+                      "thought_signature": "CssEAb4-9vv1Z420XwDgNNnX9Ol7oBitesXeN7XaHcypbt24dxBasCXaYU-EmNaMzT5D8fOKivtgwiZkFA0hftVqCWfUDxkHTCndE-UP7sQ60B5CD9DocbcMieY4vRTBnHSJKqLY9u215B08V3YRpR1TRg85vWLBwQCT7UgPhsMqp8ZF4kGeLcjWwEXfKle-37_F6uHUHemdjpJC5jyK6aHTf9gT7NPAESXPudL_sI-vG0PiYGdKiUpbutxLMHLzjpnzvqq8AoR-DZ5iF3I1wfReW20cVXX5TbUEs4aBEUd_XAd3GFn9XGwKyRPVxxPLfPCM9OoOIf2mp6_AidvYLF_1g0H1jl-6EEWoOKMKiz8w9X-Ju7XWISPZwkoPUFBmVvRDXy2yg9_3RnuT94oAFrymcNwWxPBmE4mTTMLdzY0s20Ad_hvsjoGCf2jbqefEGzkBqeLoKMwAyNNcyMyB1EL4HEdCuOs5FHIcPphTZiXqGKumLdlZfDq6muQekxbRDQo2DAl4p0V7iuCCuRSX3MrcP-Gy2g7-kBxHq33Qk_HOi1J5_D3wnUGy3RWazMJTiFFVETVPt2yQY0YoO84YkbVk9fhbUo_s1z4Mn5FBo4sWOLI-cSIfV1PKw4lZjTtC1b0n4S5QsTOvAfTIpib-wL-R5-5efzvKFU3VsavM5VYReJfAwWBCkAe7BHPkMvW2cgiKJtrgHNpMzzFfSuuqXTDo7q_KvhVRVMIWGDCTu6jg4-qLD0LkkpYFu3O4XXUmAMRmQcmtNoOIp42JyA8="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-334df22e-ae7a-4ad2-9def-d20e6ad5952b",
+                        "name": "get_similar_incidents",
+                        "response": {
+                          "ok": true,
+                          "data": [
+                            {
+                              "incident_key": "INC-2026-0004",
+                              "title": "Payment service outage affecting order placement",
+                              "status": "resolved",
+                              "severity": "sev1",
+                              "service_overlap_count": 2,
+                              "similarity_reason": "service_overlap"
+                            }
+                          ],
+                          "error": null,
+                          "source": "get_similar_incidents"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-53524c09-38ef-4749-a198-834793a22f1d",
+                        "args": {
+                          "incident_key": "INC-2026-0001"
+                        },
+                        "name": "get_incident_by_key"
+                      },
+                      "thought_signature": "Cp8FAb4-9vvJWPN801CmuGkLDzy_OMff_qR-YO5_PeiXeu_hKfc_8vswCk9UAg8hsaB0ODTDCPL6Nx_ofi-kn1e46h4DmcFy9_u1XH20HOG6jHAd4MRcFea2snq3noa6-x908paR5I7N_TmbRr5rcDb3JlaQsQBng_ISnOs4GFkQilhrhWb92sc7SSIQBvrhlbkAxD-9XJ6CXgrNZDdpJa9H9Whlu5dFWyvl_6Sd7jm8Q_7Mv6vRIhkUaegj2AAkutTi2tAhmHDERjgx1AYm5Jw_rIeL5RWPfzwNH0jZ9PynMjEIH7Xtie3iLqEwmJ93Lb_zTcGT_-fWY8U8m9_xsF01ga5MOxjJwYSPwjG_02Pnngdr6D4ahd0QsQqEbj9jAUedMw0q9zmt5iMfuPDYQqD0BOWGtkOTzGGlQrYfQTxmPSHB2r7_vCJl9tJq2YeKiT6Ho3V0mriesoqrFhgXSBnPKoeRCWRy7NstaaHdnRAD_YzcbgTyzkR2Wy_A4AXBrVv2mIXZLro5qQ0QKU_g60auPbf2jvdhvRR58dDRTmVCZ0WzxJxbkjjyt23-EE7MjDgJhyDoBi35ugmAGLGpJM6fnuxGpwT6go_i-f1hh1qFHogvJhGP85G2oxYYTk-fV5AnppOQbNS_i-JbzSsX2FfBkDv4uxh4rT7R3aIH1f-8GJdcNK1HNhe0qw9G5GcSlkU4qSJLcnZwg_oMSvT38MxjPrpLYqqXnMp4U0ehG1nb0JklHAg06p7OsbAy2BZ1QUwT0EwW3Tm2ywJCRkVk5JwfKqxVW3bDfIX6Yd9wwIaAeflbj2ELSK9U3sktxXAKR0H98AmOShcjJ0VhJicLjWVtSzoWz_NwTf9eU7w96p2ZMfxGfjI78OfyF8ofW-VbcQ4="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-53524c09-38ef-4749-a198-834793a22f1d",
+                        "name": "get_incident_by_key",
+                        "response": {
+                          "ok": true,
+                          "data": {
+                            "id": 1,
+                            "incident_key": "INC-2026-0001",
+                            "title": "Checkout failures due to payment timeout",
+                            "status": "resolved",
+                            "severity": "sev1",
+                            "started_at": "2026-03-05T09:12:00",
+                            "resolved_at": "2026-03-05T10:05:00",
+                            "summary": "Customers could not complete checkout for 53 minutes.",
+                            "created_by_user_id": 1,
+                            "commander_user_id": 2
+                          },
+                          "error": null,
+                          "source": "get_incident_by_key"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-01b56978-acdd-4acc-80db-f133394455f0",
+                        "args": {
+                          "incident_key": "INC-2026-0001"
+                        },
+                        "name": "get_resolutions"
+                      },
+                      "thought_signature": "Ct4CAb4-9vs26IXiXOCdIo8D19VriGehBx5SeDF713nVEi8SBiREJW4_hCyXvurFOxGhBp89R4k9TsxvqV7FcEH39OU3dn-ZXEC2Eg3wEd-Vf-lDETMYXXhyhls9lDSCKhGRfM2AKnfbGd7EqXN0caJRD3ctydNwW2URyAIGkf11cywImwiqkSp6Lq5UG1em6PV1nuveYwHkLnVwLwVoMCbYIb2YQa5dpghDHFtaai7dzmHQtzHfZB8EcUamJwqf-S5AZ70gFteY6dPZNWLIV5jWfi5gSF_ct0FnjhGynv8AAl9iGFqpLeTLSfHGkvJBE8-DZgd_E3cGWCsk04Sq4Nfy-_hjKVU8EmIFm4Q1xxL7fKsL6VIAU6lQcNjmNFKBjiNvibruJqYn7Tb1Z-QEgcq1-0kNWunoFpGW9DIUu0rupfzCFkYHTJo2anvYcCTJpt9CU4yxocU_63U8cdPJ6eg="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-01b56978-acdd-4acc-80db-f133394455f0",
+                        "name": "get_resolutions",
+                        "response": {
+                          "ok": true,
+                          "data": [
+                            {
+                              "id": 1,
+                              "incident_id": 1,
+                              "resolution_summary": "Rolled back payment-service release and increased timeout budget.",
+                              "root_cause": "A misconfigured HTTP client timeout in payment-service caused cascading retries.",
+                              "actions_taken_json": {
+                                "rollback": "payment-service v2026.03.05.1",
+                                "hotfix": "timeout config set to 3.5s",
+                                "verification": "checkout success rate restored to 99.2%"
+                              },
+                              "resolved_by_user_id": 2,
+                              "resolved_at": "2026-03-05T10:05:00"
+                            }
+                          ],
+                          "error": null,
+                          "source": "get_resolutions"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-ba95257e-c080-48ec-a59b-88ea8cecb598",
+                        "args": {
+                          "incident_key": "INC-2026-0004"
+                        },
+                        "name": "get_incident_by_key"
+                      },
+                      "thought_signature": "CsADAb4-9vtvWOYGkMcNUZv9uO_vRPOdjkBOYZsAgUMO-127BO1LYLXHDkuOwZeF7FctIbOR1O8wZu4RWN9MGwy65eNRA1rZN4BtXDBmdtf0QhDK1R4Ncp4pzsTF_jPbhHEFZZDrA2SHU97yeFDptDqaSzhEdxnUpuHwZ_TOYIAL3x8ZIPwAqWRka0_rAsOyNRh2y7IG7HbWgEuHyOLjgEgXNn81b5PLm-aiwE6M5GyMLHXaXkOUSRzY68W02ceGmKJy_66oOvHoZvlaRNIdVV8sdZiXYAXd0X83Ij-tmqMouqAFiCCGYfVfHSok73JJtUzYaDlgiC_CiNO_fv1lORy1nr8yhFhxjl6s1l_9b5-8481YElZcA9G2bUCxOo0AyVVyjg77F6Jp5IGm5fQh5ZUvdz54CkwtdvPZkAdbYYGIAq3jxhEGFouqO4-JpO9S8aeBH5BEry-M-mI2R_lWSJt3Rw4NqjOPd3X0UA4Ih5q1CEfomcafla8hiKqU3dw5ph49NaFqVhMLZYlJ4vPPVeQojKuQReGDqIrDfoa59areEvYTymC340O6jH3HBElB3r--coJcV3P2tWQmvxjAPu0dZA=="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-ba95257e-c080-48ec-a59b-88ea8cecb598",
+                        "name": "get_incident_by_key",
+                        "response": {
+                          "ok": true,
+                          "data": {
+                            "id": 4,
+                            "incident_key": "INC-2026-0004",
+                            "title": "Payment service outage affecting order placement",
+                            "status": "resolved",
+                            "severity": "sev1",
+                            "started_at": "2026-03-08T11:05:00",
+                            "resolved_at": "2026-03-08T12:10:00",
+                            "summary": "Payment API downtime caused checkout failures and degraded order flow.",
+                            "created_by_user_id": 2,
+                            "commander_user_id": 1
+                          },
+                          "error": null,
+                          "source": "get_incident_by_key"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-579bab44-33e9-4303-a363-2e052d204778",
+                        "args": {
+                          "incident_key": "INC-2026-0004"
+                        },
+                        "name": "get_resolutions"
+                      },
+                      "thought_signature": "CusDAb4-9vsArkq_SyRLVmPDI9HK0vVUYN-5O8gdTwrpd39j6v3tORnnCnC1zQcU2gYDicQYVqyckz5B_LSM0nnRNtLjtxVAklp3ZTgh4P5eraX_pyo_RBR-NUwUeiVFULPH2t5LZZXmB-nm_4AUJBCOkbGEzMGnKDk49pt9Tifih2QQijB-guHVJQ1bguBy2Ch5lf7RlmmaiTx9bgYiCZY_3ZLPh9oIxk2NEYfRMtWpv9OkN5LPiu5ZTu8et5hdPQubm1F7NAXvsdAxcwYmAAAAHbFTp6wGe8Hq3W_dYOsCzA6WU0A6JgPBVXMg6jmnm8K29epLuf1VPlJd2Vf4OfD4iCxeFFHcc3vGcrfR315_V7PO9T4vcHljrpYxOdpFAEZEepZXAilOvKMDjNN6FSOH6vZNxH7ZBnWkHb4Xo547L6UADhBXC8jBlVNOloIsPFwxne3G8_hNcQA_rAkI3djS5t_doG6UQIg2P4o7UU6pk1PgxLhmGKxyoo9hVs9HTrDw1PPG54_8uhzLe1wLgLLH4pDpQ1g7tvEH2E-u50NcPyHa8wPsB4_SAssH4IVNR9JYbY_1-qpFTvSTdPl5QLYL_vYqCSFqRcLQBy4y94kXR52MZUtSoLSQbmauZRrk2aUxs_7EVPzbXt6Fins="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-579bab44-33e9-4303-a363-2e052d204778",
+                        "name": "get_resolutions",
+                        "response": {
+                          "ok": true,
+                          "data": [],
+                          "error": null,
+                          "source": "get_resolutions"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              }
+            ]
+          },
+          "creation_timestamp": 1773298131.4573
+        },
+        {
+          "invocation_id": "e-f06ce027-4f1f-49d6-aab4-30a655340d11",
+          "user_content": {
+            "parts": [
+              {
+                "text": " Who owns payment-service and who are the primary and secondary escalation contacts?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "The `payment-service` is owned by User Three (user3@example.com). The primary escalation contact is 'Payments On-Call' via Slack at `#oncall-payments`. The secondary escalation contact is 'Payments Manager' via email at payments-manager@example.com.\n\n```json\n{\n  \"status\": \"complete\",\n  \"summary\": \"The `payment-service` is owned by User Three (user3@example.com). The primary escalation contact is 'Payments On-Call' via Slack at `#oncall-payments`. The secondary escalation contact is 'Payments Manager' via email at payments-manager@example.com.\",\n  \"report\": {\n    \"evidence_backed_findings\": [\n      \"The `payment-service` is owned by User Three, with email user3@example.com. (Evidence: payment-service-owner)\",\n      \"The primary escalation contact for `payment-service` is 'Payments On-Call' through Slack at `#oncall-payments`. (Evidence: payment-service-primary-escalation)\",\n      \"The secondary escalation contact for `payment-service` is 'Payments Manager' via email at payments-manager@example.com. (Evidence: payment-service-secondary-escalation)\"\n    ],\n    \"inferred_considerations\": [],\n    \"gaps_unknowns\": []\n  },\n  \"recommended_actions\": [\n    {\n      \"owner\": \"Service Ownership Team\",\n      \"action\": \"Periodically review and validate the accuracy of service ownership and escalation contact information for all critical services, including `payment-service`.\",\n      \"impact\": \"High\",\n      \"urgency\": \"Medium\"\n    },\n    {\n      \"owner\": \"On-Call Team\",\n      \"action\": \"Ensure that the 'Payments On-Call' Slack channel (#oncall-payments) is regularly monitored and that its membership is up-to-date with current on-call rotations.\",\n      \"impact\": \"High\",\n      \"urgency\": \"High\"\n    },\n    {\n      \"owner\": \"Payments Management\",\n      \"action\": \"Confirm that the 'payments-manager@example.com' email alias is actively managed and redirects to the appropriate personnel for secondary escalation.\",\n      \"impact\": \"Medium\",\n      \"urgency\": \"Medium\"\n    }\n  ],\n  \"__meta__\": {\n    \"tool_code_results\": [\n      {\n        \"tool_code\": \"print(default_api.get_service_owner(service_name = \\\"payment-service\\\"))\",\n        \"result\": {\n          \"get_service_owner_response\": {\n            \"data\": [\n              {\n                \"owner_email\": \"user3@example.com\",\n                \"owner_name\": \"User Three\",\n                \"owner_user_id\": 3,\n                \"owner_username\": \"user3\",\n                \"service_name\": \"payment-service\"\n              }\n            ],\n            \"error\": null,\n            \"ok\": true,\n            \"source\": \"get_service_owner\"\n          }\n        }\n      },\n      {\n        \"tool_code\": \"print(default_api.get_escalation_contacts(service_name = \\\"payment-service\\\"))\",\n        \"result\": {\n          \"get_escalation_contacts_response\": {\n            \"data\": [\n              {\n                \"contact_type\": \"slack\",\n                \"contact_value\": \"#oncall-payments\",\n                \"id\": 1,\n                \"is_primary\": true,\n                \"name\": \"Payments On-Call\",\n                \"priority_order\": 1,\n                \"service_id\": 3,\n                \"service_name\": \"payment-service\"\n              },\n              {\n                \"contact_type\": \"email\",\n                \"contact_value\": \"payments-manager@example.com\",\n                \"id\": 2,\n                \"is_primary\": false,\n                \"name\": \"Payments Manager\",\n                \"priority_order\": 2,\n                \"service_id\": 3,\n                \"service_name\": \"payment-service\"\n              }\n            ],\n            \"error\": null,\n            \"ok\": true,\n            \"source\": \"get_escalation_contacts\"\n          }\n        }\n      }\n    ]\n  }\n}\n```"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-0d17e1d1-338e-47d5-8502-f78c85bf1a16",
+                        "args": {
+                          "service_name": "payment-service"
+                        },
+                        "name": "get_service_owner"
+                      },
+                      "thought_signature": "CusBAb4-9vsSagCWzXb1xMaNaHxb6MyZ4Lslbq9Xny5Z9rJ9gJKXLeNm17sFdpe3WwvZLHhv7NLnHaWfttIkohcXjf9fjWzrq5DwY8sKGZ-PErCkNhKlSgziGX8t3gKE-9B_ilsJZSgc9ln9Ga7-1b_zxWYXtrUJodYp_zipbTd071HxDXTPugvvbWkC_eQeKJxHE8kq3uFxOlCvEhXIQzhAFei1xQ9RyFRszJQ2XZzCQKJ32aBY3gRQM5oKU85_ZJELLpwcR5bqbFa72xpOr1fXH9sXU_hYCrDrbMdERwUb-M7g2L_-6y_Pqb_zhA=="
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-0d17e1d1-338e-47d5-8502-f78c85bf1a16",
+                        "name": "get_service_owner",
+                        "response": {
+                          "ok": true,
+                          "data": [
+                            {
+                              "service_name": "payment-service",
+                              "owner_user_id": 3,
+                              "owner_name": "User Three",
+                              "owner_email": "user3@example.com",
+                              "owner_username": "user3"
+                            }
+                          ],
+                          "error": null,
+                          "source": "get_service_owner"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-71a0c774-0ea7-4149-aae9-f0ac876fee25",
+                        "args": {
+                          "service_name": "payment-service"
+                        },
+                        "name": "get_escalation_contacts"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "OpsCopilotOrchestratorAgent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-71a0c774-0ea7-4149-aae9-f0ac876fee25",
+                        "name": "get_escalation_contacts",
+                        "response": {
+                          "ok": true,
+                          "data": [
+                            {
+                              "id": 1,
+                              "service_id": 3,
+                              "name": "Payments On-Call",
+                              "contact_type": "slack",
+                              "contact_value": "#oncall-payments",
+                              "priority_order": 1,
+                              "is_primary": true,
+                              "service_name": "payment-service"
+                            },
+                            {
+                              "id": 2,
+                              "service_id": 3,
+                              "name": "Payments Manager",
+                              "contact_type": "email",
+                              "contact_value": "payments-manager@example.com",
+                              "priority_order": 2,
+                              "is_primary": false,
+                              "service_name": "payment-service"
+                            }
+                          ],
+                          "error": null,
+                          "source": "get_escalation_contacts"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              }
+            ]
+          },
+          "creation_timestamp": 1773298352.973406
+        }
+      ],
+      "session_input": {
+        "app_name": "adk_app",
+        "user_id": "user"
+      },
+      "creation_timestamp": 1773298397.682223
+    }
+  ],
+  "creation_timestamp": 1773298114.7536495
+}
