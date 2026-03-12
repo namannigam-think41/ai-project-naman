@@ -18,8 +18,7 @@ Better baseline: **8 sessions**
 ## Session 1: Database-Focused (3 questions)
 
 1. `Who owns payment-service and who are the escalation contacts?`
-2. `What is the likely root cause of INC-2026-0001? Show supporting evidence refs.`
-3. `Compare INC-2026-0001 with similar incidents and summarize what was different.`
+2. `Compare INC-2026-0001 with similar incidents and summarize what was different.`
 
 Expected capabilities:
 - ownership & escalation
